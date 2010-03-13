@@ -1,6 +1,18 @@
 = rack-jetty
 
-Description goes here.
+Provides a nice simple Rack Adapter for Jetty under JRuby. Once installed, you can use rackup to start it with:
+	
+	jruby -S rackup -s Jetty myapp.ru # the -S tells it to search your bin paths for rackup
+	
+Or with Rails:
+
+	jruby script/server Jetty # no -S needed since it's a relative path
+	
+The code for this is intended to be very easy to understand and is entirely done in Ruby, without the help of jruby-rack, so it should be pretty hackable.
+
+Note that if you want to run this as a real server (or for benchmarking), you'll probably want to run jruby with --server so it actually does JIT optimization and the like.
+
+Inspiration credit for this project goes out to Vladimir Dobriakov of Vodafone who wrote jetty-rackup, which wasn't quite what I needed but gave me a hell of a starting point for making this go. Thanks, Vladimir!
 
 == Note on Patches/Pull Requests
  
