@@ -9,7 +9,7 @@ module RackJetty
     def read_bytes(count, into_buffer)
       data = "\0" * count
       data = data.to_java_bytes
-      count = @input.readLine(data, 0, count)
+      count = @input.read(data, 0, count)
       if (count == -1)
         return nil
       end
@@ -32,7 +32,7 @@ module RackJetty
       if (count.nil?)
         read_all(buffer)
       else
-        read_bytes(count, buffer)
+        buffer = read_bytes(count, buffer)
       end
       return buffer
     end

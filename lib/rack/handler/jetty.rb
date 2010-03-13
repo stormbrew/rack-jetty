@@ -17,18 +17,30 @@ module Rack
       end
       
       def run()
-        connector = Java::org.mortbay.jetty.bio.SocketConnector.new
-        connector.set_host(options[:Host])
-        connector.set_port(options[:Port].to_i)
+        @connector = Java::org.mortbay.jetty.bio.SocketConnector.new
+        @connector.set_host(options[:Host])
+        @connector.set_port(options[:Port].to_i)
 
-        jetty = Java::org.mortbay.jetty.Server.new
-        jetty.addConnector(connector)
+        @jetty = Java::org.mortbay.jetty.Server.new
+        @jetty.addConnector(@connector)
         
         bridge = RackJetty::ServletHandler.new
         bridge.handler = self
         
-        jetty.set_handler(bridge)
-        jetty.start
+        @jetty.set_handler(bridge)
+        @jetty.start
+      end
+      
+      def running?
+        @jetty && @jetty.is_started
+      end
+      
+      def stopped?
+        !@jetty || @jetty.is_stopped
+      end
+      
+      def stop()
+        @jetty && @jetty.stop
       end
     end
   end

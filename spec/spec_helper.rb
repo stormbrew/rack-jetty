@@ -1,9 +1,70 @@
 $LOAD_PATH.unshift(File.dirname(__FILE__))
 $LOAD_PATH.unshift(File.join(File.dirname(__FILE__), '..', 'lib'))
-require 'rack-jetty'
+require 'rubygems'
 require 'spec'
 require 'spec/autorun'
+require 'yaml'
+require 'net/http'
 
 Spec::Runner.configure do |config|
   
+end
+
+# Borrowed from Rack's own specs.
+class TestRequest
+  def call(env)
+    status = env["QUERY_STRING"] =~ /secret/ ? 403 : 200
+    env["test.postdata"] = env["rack.input"].read
+    body = env.to_yaml
+    size = body.respond_to?(:bytesize) ? body.bytesize : body.size
+    [status, {"Content-Type" => "text/yaml", "Content-Length" => size.to_s}, [body]]
+  end
+
+  module Helpers
+    attr_reader :status, :response
+
+    ROOT = File.expand_path(File.dirname(__FILE__) + "/..")
+    ENV["RUBYOPT"] = "-I#{ROOT}/lib -rubygems"
+
+    def root
+      ROOT
+    end
+
+    def rackup
+      "#{ROOT}/bin/rackup"
+    end
+
+    def GET(path, header={})
+      Net::HTTP.start(@host, @port) { |http|
+        user = header.delete(:user)
+        passwd = header.delete(:passwd)
+
+        get = Net::HTTP::Get.new(path, header)
+        get.basic_auth user, passwd  if user && passwd
+        http.request(get) { |response|
+          @status = response.code.to_i
+          begin
+            @response = YAML.load(response.body)
+          rescue ArgumentError
+            @response = nil
+          end
+        }
+      }
+    end
+
+    def POST(path, formdata={}, header={})
+      Net::HTTP.start(@host, @port) { |http|
+        user = header.delete(:user)
+        passwd = header.delete(:passwd)
+
+        post = Net::HTTP::Post.new(path, header)
+        post.form_data = formdata
+        post.basic_auth user, passwd  if user && passwd
+        http.request(post) { |response|
+          @status = response.code.to_i
+          @response = YAML.load(response.body)
+        }
+      }
+    end
+  end
 end
