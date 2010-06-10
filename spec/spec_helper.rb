@@ -43,10 +43,10 @@ class TestRequest
         get.basic_auth user, passwd  if user && passwd
         http.request(get) { |response|
           @status = response.code.to_i
-          begin
-            @response = YAML.load(response.body)
-          rescue ArgumentError
-            @response = nil
+          if response.content_type == "text/yaml"
+            load_yaml(response)
+          else
+            @response = response
           end
         }
       }
@@ -65,6 +65,14 @@ class TestRequest
           @response = YAML.load(response.body)
         }
       }
+    end
+    
+    def load_yaml(response)
+      begin
+        @response = YAML.load(response.body)
+      rescue ArgumentError
+        @response = nil
+      end   
     end
   end
 end

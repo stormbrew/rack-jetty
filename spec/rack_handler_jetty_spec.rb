@@ -1,12 +1,20 @@
 require File.expand_path(File.dirname(__FILE__) + '/spec_helper')
 require 'rack/handler/jetty'
 require 'rack/lint'
+require 'rack/builder'
+require 'rack/static'
 
 describe Rack::Handler::Jetty do
   include TestRequest::Helpers
   
   before :all do
-    @server = Rack::Handler::Jetty.new(Rack::Lint.new(TestRequest.new), :Host => @host='0.0.0.0',:Port => @port=9204)
+    app = Rack::Builder.app do
+      use Rack::Lint
+      use Rack::Static, :urls => ["/spec/images"]
+      run TestRequest.new
+    end
+    
+    @server = Rack::Handler::Jetty.new(app, :Host => @host='0.0.0.0',:Port => @port=9204)
     Thread.new do
       @server.run
     end
@@ -63,5 +71,13 @@ describe Rack::Handler::Jetty do
   it "should not set content-type to '' in requests" do
     GET("/test", 'Content-Type' => '')
     response['Content-Type'].should == nil
+  end
+  
+  it "should serve images" do
+    file_size = File.size(File.join(File.dirname(__FILE__), 'images', 'image.jpg'))
+    GET("/spec/images/image.jpg")
+    status.should == 200
+    response.content_length.should == file_size
+    response.body.size.should == file_size
   end
 end
