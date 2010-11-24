@@ -59,4 +59,9 @@ describe Rack::Handler::Jetty do
     status.should == 403
     response["rack.url_scheme"].should == "http"
   end
+
+  it "should not set content-type to '' in requests" do
+    GET("/test", 'Content-Type' => '')
+    response['Content-Type'].should == nil
+  end
 end

@@ -22,7 +22,7 @@ module RackJetty
         env = DefaultRackEnv.merge({
           'rack.input' => Rack::RewindableInput.new(JavaInput.new(request.get_input_stream)),
           'rack.url_scheme' => request.get_scheme,
-          'CONTENT_TYPE' => request.get_content_type.to_s,
+          'CONTENT_TYPE' => request.get_content_type,
           'CONTENT_LENGTH' => request.get_content_length, # some post-processing done below
           'REQUEST_METHOD' => request.get_method || "GET",
           'REQUEST_URI' => request.getRequestURI,
@@ -40,6 +40,17 @@ module RackJetty
           k = "HTTP_#{h.upcase.gsub(/-/, '_')}"
           env[k] = request.getHeader(h) unless env.has_key?(k)
         end
+
+        # request.get_content_type returns nil if the Content-Type is not included
+        # and Rack doesn't expect Content-Type => '' - certain methods will issue 
+        # a backtrace if it's passed in. 
+        #
+        # The correct behaviour is not to include Content-Type in the env hash
+        # if it is blank. 
+        #
+        # https://github.com/rack/rack/issues#issue/40 covers the problem from
+        # Rack's end. 
+        env.delete('CONTENT_TYPE') if [nil, ''].include?(env['CONTENT_TYPE'])
 
         status, headers, output = handler.app.call(env)
         
