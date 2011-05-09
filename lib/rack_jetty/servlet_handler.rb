@@ -1,5 +1,6 @@
 require 'rack'
 require 'rack/rewindable_input'
+require 'rack_jetty/version'
 
 Dir[::File.join(::File.dirname(__FILE__), 'jars', '*.jar')].each { |jar| require jar }
 
@@ -14,6 +15,7 @@ module RackJetty
       'rack.run_once' => false,
       'rack.errors' => $stderr,
       'jruby.version' => JRUBY_VERSION,
+      'rack_jetty.version' => RackJetty::VERSION,
       'SCRIPT_NAME' => '',
     }
 
