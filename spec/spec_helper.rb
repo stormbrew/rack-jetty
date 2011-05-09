@@ -1,14 +1,10 @@
 $LOAD_PATH.unshift(File.dirname(__FILE__))
 $LOAD_PATH.unshift(File.join(File.dirname(__FILE__), '..', 'lib'))
 require 'rubygems'
-require 'spec'
-require 'spec/autorun'
+require 'rspec'
+require 'rspec/autorun'
 require 'yaml'
 require 'net/http'
-
-Spec::Runner.configure do |config|
-  
-end
 
 # Borrowed from Rack's own specs.
 class TestRequest
