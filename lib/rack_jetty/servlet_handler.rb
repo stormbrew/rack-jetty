@@ -6,6 +6,7 @@ Dir[::File.join(::File.dirname(__FILE__), 'jars', '*.jar')].each { |jar| require
 
 module RackJetty
   class ServletHandler
+    include Java::javax.servlet.Filter
     attr_accessor :handler
 
     DefaultRackEnv = {
