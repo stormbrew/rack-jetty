@@ -5,7 +5,7 @@ require 'rack_jetty/version'
 Dir[::File.join(::File.dirname(__FILE__), 'jars', '*.jar')].each { |jar| require jar }
 
 module RackJetty
-  class ServletHandler < Java::org.mortbay.jetty.handler.AbstractHandler
+  class ServletHandler
     attr_accessor :handler
 
     DefaultRackEnv = {
@@ -19,7 +19,10 @@ module RackJetty
       'SCRIPT_NAME' => '',
     }
 
-    def handle(target, request, response, dispatch)
+    def init(filter_config)
+    end
+
+    def doFilter(request, response, chain)
       begin
         env = DefaultRackEnv.merge({
           'rack.input' => Rack::RewindableInput.new(JavaInput.new(request.get_input_stream)),
@@ -80,6 +83,9 @@ module RackJetty
       ensure
         request.set_handled(true)
       end
+    end
+
+    def destroy
     end
   end
 end
