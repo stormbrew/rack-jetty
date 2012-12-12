@@ -13,7 +13,7 @@ module RackJetty
       if (count == -1)
         return nil
       end
-      into_buffer << String.from_java_bytes(data[0,count])
+      into_buffer.replace String.from_java_bytes(data[0,count])
       return into_buffer
     end
     
