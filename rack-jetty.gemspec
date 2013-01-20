@@ -45,6 +45,7 @@ Gem::Specification.new do |s|
 
   s.add_development_dependency(%q<rspec>, ["~> 2.0"])
   s.add_development_dependency(%q<rake>, ["~> 10.0"])
+  s.add_development_dependency(%q<rdoc>, ["~> 3.12"])
   s.add_runtime_dependency(%q<rack>, ["~> 1.0"])
 end
 
