@@ -16,7 +16,7 @@ class FakeInput
       return -1
     else
       inbuf = "\0"*length
-      string_read = @io.read( length, inbuf )
+      string_read = @io.read( length, inbuf ).to_java_bytes
       string_read.length.times do |i|
         buffer[offset+i] = string_read[i]
       end
@@ -29,7 +29,7 @@ class ByteAtATimeIO
   def initialize( content )
     @io = StringIO.new( content )
   end
-  
+
   def read( n, buf )
     @io.read( 1, buf )
   end
